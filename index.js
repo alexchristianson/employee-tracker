@@ -56,6 +56,7 @@ function init () {
     });
 };
 
+// view all departments
 function viewDepartments() {
     connection.query(`SELECT * FROM departments`, (err, res) => {
         if (err) {
@@ -66,6 +67,7 @@ function viewDepartments() {
     });
 };
 
+// view all roles
 function viewRoles() {
     connection.query(`SELECT * FROM roles`, (err, res) => {
         if (err) {
@@ -76,6 +78,7 @@ function viewRoles() {
     }); 
 };
 
+// view all employees
 function viewEmployees() {
     connection.query(`SELECT * FROM employees`, (err, res) => {
         if (err) {
@@ -86,6 +89,7 @@ function viewEmployees() {
     }); 
 };
 
+// add a department
 function addDepartment() {
     inquirer.prompt([
         {
@@ -106,6 +110,7 @@ function addDepartment() {
     })
 };
 
+// add a role
 function addRole() {
     connection.query(`SELECT * FROM departments`, (err, res) => {
         if (err) {
@@ -125,11 +130,12 @@ function addRole() {
             {
                 name: "department_id",
                 type: "list",
-                message: "Which department would you like to add them to?",
+                message: "Which department would you like to add this role to?",
                 choices: res.map(department => department.name)
             }
-        ]).then(data => {
-            const chosenDepartment = res.find(department => department.name === data.department_id)
+        ])
+        .then(data => {
+            const chosenDepartment = res.find(department => department.name === data.department_id);
 
             connection.query(`INSERT INTO roles SET ?`, {
                 title: data.add_role,
@@ -145,3 +151,71 @@ function addRole() {
         });
     });
 };
+
+// add an employee
+function addEmployee() {
+    connection.query(`SELECT * FROM roles`, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        inquirer.prompt([
+            { 
+                name: "add_firstName",
+                type: "input",
+                message: "What is the new employee's first name",
+            },
+            {
+                name: "add_lastName",
+                type: "input",
+                message: "What is the new employee's last name"
+            },
+            {
+                name: "role_id",
+                type: "list",
+                message: "Choose the new employee's role",
+                choices: res.map(role => role.title)
+            }
+        ])
+        .then(data => {
+            const chosenRole = res.find(role => role.title === data.role_id);
+            const newDepartment = res.find(role => role.department_id === data.department_id);
+            const newFirstName = data.add_firstName;
+            const newLastName = data.add_lastName;
+
+            connection.query(`SELECT * FROM employees`, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                inquirer.prompt([
+                    {
+                        name: "manager_id",
+                        type: "list",
+                        message: "Select the manager of the new employee.",
+                        choices: res.map(data => data.first_name)
+                    }
+                ])
+                .then((answer) => {
+                    const chosenManager = res.find(manager => manager.first_name === answer.manager_id);
+
+                    connection.query(`INSERT INTO employees SET ?`, {
+                        first_name: newFirstName,
+                        last_name: newLastName,
+                        role_id: chosenRole.id,
+                        manager_id: chosenManager.id,
+                        salary_id: chosenRole.id,
+                        department_id: newDepartment.id
+                    },
+                        function(err) {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log("You added " + newFirstName + " " + newLastName + "!")
+                        init();  
+                    });
+                });
+            });
+        });
+    });
+};
+
+// update employee role
