@@ -19,8 +19,8 @@
     "url": "git+https://github.com/alexchristianson/employee-tracker.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Alex Christianson",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/alexchristianson/employee-tracker/issues"
   },
