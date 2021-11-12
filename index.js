@@ -65,3 +65,83 @@ function viewDepartments() {
         init();
     });
 };
+
+function viewRoles() {
+    connection.query(`SELECT * FROM roles`, (err, res) => {
+        if (err) {
+            throw error;
+        }
+        console.table(res);
+        init();
+    }); 
+};
+
+function viewEmployees() {
+    connection.query(`SELECT * FROM employees`, (err, res) => {
+        if (err) {
+            throw error;
+        }
+        console.table(res);
+        init();
+    }); 
+};
+
+function addDepartment() {
+    inquirer.prompt([
+        {
+            name: "add_dept",
+            type: "input",
+            message: "What department would you like to add?"
+        }
+    ]).then(data => {
+        connection.query(`INSERT INTO departments SET ?`, {
+            name: data.add_dept,
+        }, 
+        function(err) {
+            if (err) {
+                throw err;
+            }
+            init();
+        });
+    })
+};
+
+function addRole() {
+    connection.query(`SELECT * FROM departments`, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        inquirer.prompt([
+            { 
+                name: "add_role",
+                type: "input",
+                message: "What role would you like to add?",
+            },
+            {
+                name: "add_salary",
+                type: "input",
+                message: "What would you like their salary to be?"
+            },
+            {
+                name: "department_id",
+                type: "list",
+                message: "Which department would you like to add them to?",
+                choices: res.map(department => department.name)
+            }
+        ]).then(data => {
+            const chosenDepartment = res.find(department => department.name === data.department_id)
+
+            connection.query(`INSERT INTO roles SET ?`, {
+                title: data.add_role,
+                salary: data.add_salary,
+                department_id: chosenDepartment.id
+            }, 
+            function(err) {
+                if (err) {
+                    throw err;
+                }
+                init();
+            });
+        });
+    });
+};
