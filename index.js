@@ -47,7 +47,7 @@ function init () {
                 addEmployee();
                 break;
               case "Update employee roles":
-                selectEmp();
+                updateEmployeeRole();
                 break;
               case "exit":
                 connection.end();
@@ -219,3 +219,46 @@ function addEmployee() {
 };
 
 // update employee role
+function updateEmployeeRole() {
+    connection.query(`SELECT * FROM employees`, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        inquirer.prompt([
+            {
+                name: "employee_update",
+                type: "list",
+                message: "Which employee do you want to update?",
+                choices: res.map(employee => employee.first_name)
+            }
+        ])
+        .then((data) => {
+            const updateEmployee = (data.employee_update.id);
+            connection.query(`SELECT * FROM roles`, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                inquirer.prompt([
+                    {
+                        name: "role_id",
+                        type: "list",
+                        message: "What do you want the employee's new role to be?",
+                        choices: res.map(role => role.title)
+                    }
+                ])
+                .then((data) => {
+                    const chosenRole = res.find(role => role.title === data.role_id);
+                    const params = [chosenRole.id, updateEmployee.first_name]
+
+                    connection.query(`UPDATE employees SET role_id = ? WHERE first_name = ?`), params, (err, result) => {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log("You updated " + updateEmployee + "'s role to " + result.role_id)
+                        init();
+                    }
+                });
+            });
+        });
+    });
+};
