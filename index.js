@@ -9,6 +9,8 @@ connection.connect(() => {
     init();
 })
 
+
+// function to begin prompts
 function init () {
     inquirer.prompt([
         {
@@ -23,40 +25,44 @@ function init () {
             "Add a new role",
             "Add a new employee",
             "Update employee roles",
+            "Update employee manager",
             "Exit"
           ]
         }])
         .then(function (answer) {
             switch (answer.action) {
-              case "View all departments":
-                viewDepartments();
-                break;
-              case "View all roles":
-                viewRoles();
-                break;
-              case "View all employees":
-                viewEmployees();
-                break;
-              case "Add a new department":
-                addDepartment();
-                break;
-              case "Add a new role":
-                addRole();
-                break;
-              case "Add a new employee":
-                addEmployee();
-                break;
-              case "Update employee roles":
-                updateEmployeeRole();
-                break;
-              case "exit":
-                connection.end();
-                break;
+                case "View all departments":
+                    viewDepartments();
+                    break;
+                case "View all roles":
+                    viewRoles();
+                    break;
+                case "View all employees":
+                    viewEmployees();
+                    break;
+                case "Add a new department":
+                    addDepartment();
+                    break;
+                case "Add a new role":
+                    addRole();
+                    break;
+                case "Add a new employee":
+                    addEmployee();
+                    break;
+                case "Update employee roles":
+                    updateEmployeeRole();
+                    break;
+                case "Update employee manager":
+                    updateEmployeeManager();
+                    break;
+                case "exit":
+                    connection.end();
+                    break;
         }
     });
 };
 
-
+// VIEW FUNCTIONS///////////////////////////////////////////////
 
 // view all departments
 function viewDepartments() {
@@ -90,6 +96,8 @@ function viewEmployees() {
         init();
     }); 
 };
+
+// ADD FUNCTIONS////////////////////////////////////////////////
 
 // add a department
 function addDepartment() {
@@ -220,6 +228,8 @@ function addEmployee() {
     });
 };
 
+// UPDATE FUNCTIONS//////////////////////////////////////////////////
+
 // update employee role
 function updateEmployeeRole() {
     connection.query(`SELECT * FROM employees`, (err, res) => {
@@ -228,14 +238,14 @@ function updateEmployeeRole() {
         }
         inquirer.prompt([
             {
-                name: "employee_update",
+                name: "employeeUpdate",
                 type: "list",
                 message: "Which employee do you want to update?",
                 choices: res.map(employee => employee.first_name)
             }
         ])
         .then((data) => {
-            const updateEmployee = (data.employee_update);
+            const updateEmployee = (data.employeeUpdate);
             console.log(updateEmployee);
 
             connection.query(`SELECT * FROM roles`, (err, res) => {
@@ -255,6 +265,49 @@ function updateEmployeeRole() {
 
                     connection.promise().query(`UPDATE employees SET role_id = ${chosenRole.id}, department_id = ${chosenRole.department_id} WHERE first_name = '${updateEmployee}'`)
                     .then(console.log("You updated " + updateEmployee + "'s role to " + chosenRole.title)) 
+                    .catch(err => console.log(err)) 
+                        init();
+                });
+            });
+        });
+    });
+};
+
+// update employee manager
+function updateEmployeeManager() {
+    connection.query(`SELECT * FROM employees`, (err, res) => {
+        if (err) {
+            throw err;
+        }
+        inquirer.prompt([
+            {
+                name: "employeeManagerUpdate",
+                type: "list",
+                message: "Which employee do you want to update?",
+                choices: res.map(employee => employee.first_name)
+            }
+        ])
+        .then((data) => {
+            const updateEmployeeManager = (data.employeeManagerUpdate);
+            console.log(updateEmployeeManager);
+
+            connection.query(`SELECT * FROM employees`, (err, res) => {
+                if (err) {
+                    throw err;
+                }
+                inquirer.prompt([
+                    {
+                        name: "manager_id",
+                        type: "list",
+                        message: "Who do you want the employee's new manager to be?",
+                        choices: res.map(manager => manager.first_name)
+                    }
+                ])
+                .then((data) => {
+                    const chosenManager = res.find(manager => manager.first_name === data.manager_id);
+
+                    connection.promise().query(`UPDATE employees SET manager_id = ${chosenManager.id} WHERE first_name = '${updateEmployeeManager}'`)
+                    .then(console.log("You updated " + updateEmployeeManager + "'s role to " + chosenManager.first_name)) 
                     .catch(err => console.log(err)) 
                         init();
                 });
