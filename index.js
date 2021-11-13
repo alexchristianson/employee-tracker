@@ -180,7 +180,7 @@ function addEmployee() {
         ])
         .then(data => {
             const chosenRole = res.find(role => role.title === data.role_id);
-            const newDepartment = res.find(role => role.department_id === data.department_id);
+            const newDepartment = chosenRole.department_id;
             const newFirstName = data.add_firstName;
             const newLastName = data.add_lastName;
 
@@ -205,7 +205,7 @@ function addEmployee() {
                         role_id: chosenRole.id,
                         manager_id: chosenManager.id,
                         salary_id: chosenRole.id,
-                        department_id: newDepartment.id
+                        department_id: newDepartment
                     },
                         function(err) {
                         if (err) {
@@ -253,7 +253,7 @@ function updateEmployeeRole() {
                 .then((data) => {
                     const chosenRole = res.find(role => role.title === data.role_id);
 
-                    connection.promise().query(`UPDATE employees SET role_id = ${chosenRole.id} WHERE first_name = '${updateEmployee}'`)
+                    connection.promise().query(`UPDATE employees SET role_id = ${chosenRole.id}, department_id = ${chosenRole.department_id} WHERE first_name = '${updateEmployee}'`)
                     .then(console.log("You updated " + updateEmployee + "'s role to " + chosenRole.title)) 
                     .catch(err => console.log(err)) 
                         init();
