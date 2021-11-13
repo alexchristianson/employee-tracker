@@ -56,6 +56,8 @@ function init () {
     });
 };
 
+
+
 // view all departments
 function viewDepartments() {
     connection.query(`SELECT * FROM departments`, (err, res) => {
@@ -233,7 +235,9 @@ function updateEmployeeRole() {
             }
         ])
         .then((data) => {
-            const updateEmployee = (data.employee_update.id);
+            const updateEmployee = (data.employee_update);
+            console.log(updateEmployee);
+
             connection.query(`SELECT * FROM roles`, (err, res) => {
                 if (err) {
                     throw err;
@@ -248,15 +252,11 @@ function updateEmployeeRole() {
                 ])
                 .then((data) => {
                     const chosenRole = res.find(role => role.title === data.role_id);
-                    const params = [chosenRole.id, updateEmployee.first_name]
 
-                    connection.query(`UPDATE employees SET role_id = ? WHERE first_name = ?`), params, (err, result) => {
-                        if (err) {
-                            throw err;
-                        }
-                        console.log("You updated " + updateEmployee + "'s role to " + result.role_id)
+                    connection.promise().query(`UPDATE employees SET role_id = ${chosenRole.id} WHERE first_name = '${updateEmployee}'`)
+                    .then(console.log("You updated " + updateEmployee + "'s role to " + chosenRole.title)) 
+                    .catch(err => console.log(err)) 
                         init();
-                    }
                 });
             });
         });
