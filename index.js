@@ -28,36 +28,37 @@ function init () {
             "Update employee manager",
             "Exit"
           ]
-        }])
-        .then(function (answer) {
-            switch (answer.action) {
-                case "View all departments":
-                    viewDepartments();
-                    break;
-                case "View all roles":
-                    viewRoles();
-                    break;
-                case "View all employees":
-                    viewEmployees();
-                    break;
-                case "Add a new department":
-                    addDepartment();
-                    break;
-                case "Add a new role":
-                    addRole();
-                    break;
-                case "Add a new employee":
-                    addEmployee();
-                    break;
-                case "Update employee roles":
-                    updateEmployeeRole();
-                    break;
-                case "Update employee manager":
-                    updateEmployeeManager();
-                    break;
-                case "exit":
-                    connection.end();
-                    break;
+        }
+    ])
+    .then(function (answer) {
+        switch (answer.action) {
+            case "View all departments":
+                viewDepartments();
+                break;
+            case "View all roles":
+                viewRoles();
+                break;
+            case "View all employees":
+                viewEmployees();
+                break;
+            case "Add a new department":
+                addDepartment();
+                break;
+            case "Add a new role":
+                addRole();
+                break;
+            case "Add a new employee":
+                addEmployee();
+                break;
+            case "Update employee roles":
+                updateEmployeeRole();
+                break;
+            case "Update employee manager":
+                updateEmployeeManager();
+                break;
+            case "exit":
+                connection.end();
+                break;
         }
     });
 };
@@ -204,8 +205,8 @@ function addEmployee() {
                         choices: res.map(data => data.first_name)
                     }
                 ])
-                .then((answer) => {
-                    const chosenManager = res.find(manager => manager.first_name === answer.manager_id);
+                .then((data) => {
+                    const chosenManager = res.find(manager => manager.first_name === data.manager_id);
 
                     connection.query(`INSERT INTO employees SET ?`, {
                         first_name: newFirstName,
