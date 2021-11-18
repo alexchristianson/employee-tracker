@@ -6,7 +6,7 @@
 This is a command-line application to manage a company's employee database. It uses Node.js, Inquirer, and MySQL.
 
 ## Walkthrough
-:link:
+:link:https://github.com/alexchristianson/employee-tracker/blob/main/assets/demo/employee-tracker-demo.webm
 
 ## Table of Contents
 * [License](#license)
