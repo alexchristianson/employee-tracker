@@ -8,6 +8,9 @@ This is a command-line application to manage a company's employee database. It u
 ## Walkthrough
 :link:https://github.com/alexchristianson/employee-tracker/blob/main/assets/demo/employee-tracker-demo.webm
 
+## Usage
+Run node index.js
+
 ## Table of Contents
 * [License](#license)
 * [Questions](#questions)
